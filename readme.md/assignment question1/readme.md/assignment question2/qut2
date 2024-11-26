@@ -1,0 +1,64 @@
+// System Health Monitoring Script
+
+import psutil
+import logging
+
+# Set up logging
+logging.basicConfig(filename="system_health.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+
+# Thresholds
+CPU_THRESHOLD = 80
+MEMORY_THRESHOLD = 80
+DISK_THRESHOLD = 90
+
+def monitor_system():
+    # Monitor CPU usage
+    cpu_usage = psutil.cpu_percent(interval=1)
+    if cpu_usage > CPU_THRESHOLD:
+        logging.warning(f"High CPU usage: {cpu_usage}%")
+
+    # Monitor memory usage
+    memory_info = psutil.virtual_memory()
+    if memory_info.percent > MEMORY_THRESHOLD:
+        logging.warning(f"High memory usage: {memory_info.percent}%")
+
+    # Monitor disk space
+    disk_usage = psutil.disk_usage('/')
+    if disk_usage.percent > DISK_THRESHOLD:
+        logging.warning(f"Low disk space: {disk_usage.percent}% used")
+
+    # Monitor running processes
+    processes = len(psutil.pids())
+    logging.info(f"Running processes: {processes}")
+
+if __name__ == "__main__":
+    monitor_system()
+    print("System monitoring complete. Check system_health.log for details.")
+
+// Application Health Checker
+
+import requests
+import logging
+
+# Set up logging
+logging.basicConfig(filename="app_health.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+
+# URL to check
+APP_URL = "http://example.com"
+
+def check_application_health(url):
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            logging.info(f"Application is UP. Status code: {response.status_code}")
+            print("Application is UP")
+        else:
+            logging.warning(f"Application is DOWN. Status code: {response.status_code}")
+            print("Application is DOWN")
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error checking application health: {e}")
+        print("Application is DOWN")
+
+if __name__ == "__main__":
+    check_application_health(APP_URL)
+
